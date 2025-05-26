@@ -1,4 +1,4 @@
-def say(text: str) -> None:
-    print(text)
+def main():
+    print("hello world")
 
-say("Hellow world")
+main()
