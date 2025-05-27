@@ -12,5 +12,3 @@ class Deka(Queue, Stack):
 
     def get_last_item(self):
         return Stack.get_item(self)
-
-deka = Deka()
