@@ -4,9 +4,7 @@ class Stack(BaseStructure):
     '''
     LIFO - last in first out
     '''
-    __index_extracted_item = -1
+    __index_last_item = -1
 
-    def __init__(self):
-        super().__init__(self.__index_extracted_item)
-
-stack = Stack()
+    def get_item(self):
+        return BaseStructure.get_item(self.__index_last_item)

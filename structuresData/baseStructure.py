@@ -1,16 +1,26 @@
 from typing import Any
 
 class BaseStructure():
-    def __init__(self, index_extracted_item: int) -> None:
-        self.collection = []
-        self.__index_extracted_item = index_extracted_item
+    def __init__(self):
+        self._collection = []
 
-    def put(self, item: Any) -> None:
-        self.collection.append(item)
+    def put_item(self, item: Any) -> None:
+        self._collection.append(item)
 
-    def get(self) -> Any:
-        return self.collection.pop(self.__index_extracted_item)
+    def get_item(self, index_item: int) -> Any:
+        return self._collection[index_item]
+    
+    def extract_item(self, index_item: int) -> Any:
+        return self._collection.pop(index_item)
+
+    def get_all_items(self) -> list:
+        return self._collection
     
     @property
-    def size(self):
-        return len(self.collection)
+    def is_empty(self) -> int:
+        return len(self._collection) == 0
+    
+    @property
+    def size(self) -> int:
+        return len(self._collection)
+    

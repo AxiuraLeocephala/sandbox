@@ -4,9 +4,7 @@ class Queue(BaseStructure):
     '''
     FIFO - first in first out
     '''
-    __index_extracted_item = 0
+    __index_last_item = 0
 
-    def __init__(self):
-        super().__init__(self.__index_extracted_item)
-
-queue = Queue()
+    def get_item(self):
+        return BaseStructure.get_item(self, self.__index_last_item)
