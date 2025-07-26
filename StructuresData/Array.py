@@ -1,17 +1,17 @@
-from typing import Any, List, Optional, Iterable, SupportsIndex, TypeVar, Type
+from typing import Any, List, Optional, Iterable, SupportsIndex, Union, TypeVar, Type
 from math import floor
 from random import random, randint
 
 _T = TypeVar("_T")
 
 # Classic array: static length, only one type of elements
-class Array(List):
+class Array(list):
     __type_elements: Type
 
-    def __init__(self, *args: Any, type_elements: Type, length: Optional[int] = None):
+    def __init__(self, *args: Any, type_elements: Type, length: int = None):
         self.__type_elements = type_elements
         if not all(isinstance(arg, self.__type_elements) for arg in args):
-            raise ValueError("All array arguments must be of the same type")
+            raise ValueError(f"All array arguments must be of the same type, {self.__type_elements}")
         
         super().__init__(args)
         
@@ -66,6 +66,28 @@ class Array(List):
                     self[i] = self[j]
                     self[j] = elem
 
+    def inserting_sort(self) -> None:
+        n = len(self)
+        for i in range(1, n):
+            key = self[i]
+            j = i - 1
+            while j >= 0 and key < self[j]:
+                self[j + 1] = self[j]
+                j -= 1
+            self[j + 1] = key
+
+    def selection_sort(self) -> None:
+        n = len(self)
+
+        for i in range(n):
+            min_idx = i
+            
+            for j in range(i + 1, n):
+                if self[j] < self[min_idx]:
+                    min_idx = j
+            
+            self[i], self[min_idx] = self[min_idx], self[i]
+
 class DynamicArray(List):
     __type_elements: Type
 
@@ -76,17 +98,22 @@ class DynamicArray(List):
         
         super().__init__(args)
 
+def is_worked(arr):
+    for i in range(len(arr) - 1):
+        if arr[i] > arr[i + 1]:
+            return "Not sorted"
+    return "Sorted"
 
 if __name__ == "__main__":
     array = Array(type_elements=int, length=10)
+    # array: List = [None] * 10
     min_number = 56
     max_number = 6583
 
     for i in range(len(array)):
         array[i] = floor((random() * (max_number - min_number + 1)) + min_number)
 
-    
-
     print(array)
-    array.bubble_sort()
+    array.selection_sort()
     print(array)
+    print(is_worked(array))
