@@ -1,6 +1,6 @@
-from typing import Any, List, Optional, Iterable, SupportsIndex, Union, TypeVar, Type
+from typing import Any, List, Iterable, SupportsIndex, Union, TypeVar, Type
 from math import floor
-from random import random, randint
+from random import random
 
 _T = TypeVar("_T")
 
@@ -114,7 +114,9 @@ class Array(list):
                 if perform_comparison(self[extereme], self[j]):
                     extereme = j
 
-            self[extereme], self[i] = self[i], self[extereme] 
+            self[extereme], self[i] = self[i], self[extereme]
+
+    
 
 class DynamicArray(List):
     __type_elements: Type
@@ -127,22 +129,26 @@ class DynamicArray(List):
         super().__init__(args)
 
 def is_sorted(arr, reverse: bool = False):
+    answer = "Sorted"
+    ansi = "\033[37m\033[42m{}\033[0m"
+
     for i in range(len(arr) - 1):
         if (reverse and arr[i] < arr[i + 1]) or (not reverse and arr[i] > arr[i + 1]):
-            return "Not sorted"
+            answer = "Not sorted"
+            ansi = "\033[37m\033[41m{}\033[0m"
 
-    return "Sorted"
+    print(ansi.format(answer))
 
 if __name__ == "__main__":
-    array = Array(5793, 2193, 4961, 1621, 2824, 6288, 124, 4656, 3762, 1195, type_elements=int, length=10)
+    array = Array(type_elements=int, length=10)
     # array: List = [None] * 10
     min_number = 56
     max_number = 6583
 
-    # for i in range(len(array)):
-    #     array[i] = floor((random() * (max_number - min_number + 1)) + min_number)
+    for i in range(len(array)):
+        array[i] = floor((random() * (max_number - min_number + 1)) + min_number)
 
     print(array)
     array.selecting_sort(reverse=True)
     print(array)
-    print(is_sorted(array, reverse=True))
+    is_sorted(array, reverse=True)
