@@ -58,35 +58,63 @@ class Array(list):
         super().insert(index, None)
         return object
     
-    def bubble_sort(self) -> None:
-        for i in range(len(self) - 1):
-            for j in range(i + 1, len(self)):
-                if self[i] > self[j]:
-                    elem = self[i]
-                    self[i] = self[j]
-                    self[j] = elem
-
-    def inserting_sort(self) -> None:
+    def bubble_sort(self, reverse: bool = False) -> None:
         n = len(self)
+
+        def from_less_to_more(i, j):
+            if self[i] > self[j]:
+                self[i], self[j] = self[j], self[i]
+
+        def from_more_to_less():
+            if self[i] < self[j]:
+                self[i], self[j] = self[j], self[i]
+
+        perform_comparison = from_more_to_less if reverse else from_less_to_more
+
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                perform_comparison(i, j)
+
+    def inserting_sort(self, reverse: bool = False) -> None:
+        n = len(self)
+
+        def from_less_to_more(key, j_elem): 
+            return key < j_elem
+
+        def from_more_to_less(key, j_elem): 
+            return key > j_elem
+
+        preform_comparison = from_more_to_less if reverse else from_less_to_more
+
         for i in range(1, n):
             key = self[i]
             j = i - 1
-            while j >= 0 and key < self[j]:
-                self[j + 1] = self[j]
-                j -= 1
-            self[j + 1] = key
 
-    def selection_sort(self) -> None:
+            while j >= 0 and preform_comparison(key, self[j]):
+                self[j + 1] = self[j]
+                j -=1
+
+            self[j + 1] = key
+ 
+    def selecting_sort(self, reverse: bool = False) -> None:
         n = len(self)
 
-        for i in range(n):
-            min_idx = i
-            
+        def from_less_to_more(extreme_elem, j_elem):
+            return extreme_elem > j_elem
+
+        def from_more_to_less(extreme_elem, j_elem):
+            return extreme_elem < j_elem
+
+        perform_comparison = from_more_to_less if reverse else from_less_to_more
+
+        for i in range(n - 1):
+            extereme = i
+
             for j in range(i + 1, n):
-                if self[j] < self[min_idx]:
-                    min_idx = j
-            
-            self[i], self[min_idx] = self[min_idx], self[i]
+                if perform_comparison(self[extereme], self[j]):
+                    extereme = j
+
+            self[extereme], self[i] = self[i], self[extereme] 
 
 class DynamicArray(List):
     __type_elements: Type
@@ -98,22 +126,23 @@ class DynamicArray(List):
         
         super().__init__(args)
 
-def is_worked(arr):
+def is_sorted(arr, reverse: bool = False):
     for i in range(len(arr) - 1):
-        if arr[i] > arr[i + 1]:
+        if (reverse and arr[i] < arr[i + 1]) or (not reverse and arr[i] > arr[i + 1]):
             return "Not sorted"
+
     return "Sorted"
 
 if __name__ == "__main__":
-    array = Array(type_elements=int, length=10)
+    array = Array(5793, 2193, 4961, 1621, 2824, 6288, 124, 4656, 3762, 1195, type_elements=int, length=10)
     # array: List = [None] * 10
     min_number = 56
     max_number = 6583
 
-    for i in range(len(array)):
-        array[i] = floor((random() * (max_number - min_number + 1)) + min_number)
+    # for i in range(len(array)):
+    #     array[i] = floor((random() * (max_number - min_number + 1)) + min_number)
 
     print(array)
-    array.selection_sort()
+    array.selecting_sort(reverse=True)
     print(array)
-    print(is_worked(array))
+    print(is_sorted(array, reverse=True))
