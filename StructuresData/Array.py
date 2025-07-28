@@ -1,6 +1,6 @@
 from typing import Any, List, Iterable, SupportsIndex, Union, TypeVar, Type
 from math import floor
-from random import random
+from random import randrange
 
 _T = TypeVar("_T")
 
@@ -58,6 +58,19 @@ class Array(list):
         super().insert(index, None)
         return object
     
+    @property
+    def is_sorted(self):
+        if self[0] > self[1]:
+            for i in range(len(self) - 1):
+                if self[i] < self[i + 1]:
+                    return False
+        else:
+            for i in range(len(self) - 1):
+                if self[i] > self[i + 1]:
+                    return False
+        
+        return True
+
     def bubble_sort(self, reverse: bool = False) -> None:
         n = len(self)
 
@@ -65,7 +78,7 @@ class Array(list):
             if self[i] > self[j]:
                 self[i], self[j] = self[j], self[i]
 
-        def from_more_to_less():
+        def from_more_to_less(i, j):
             if self[i] < self[j]:
                 self[i], self[j] = self[j], self[i]
 
@@ -78,45 +91,75 @@ class Array(list):
     def inserting_sort(self, reverse: bool = False) -> None:
         n = len(self)
 
-        def from_less_to_more(key, j_elem): 
-            return key < j_elem
+        def from_less_to_more(key, i_elem):
+            return key < self[j]
 
-        def from_more_to_less(key, j_elem): 
-            return key > j_elem
-
-        preform_comparison = from_more_to_less if reverse else from_less_to_more
+        def from_more_to_less(key, i_elem):
+            return key > self[j]
+        
+        perform_comparison = from_more_to_less if reverse else from_less_to_more
 
         for i in range(1, n):
             key = self[i]
             j = i - 1
 
-            while j >= 0 and preform_comparison(key, self[j]):
+            while j >= 0 and perform_comparison(key, self[j]):
                 self[j + 1] = self[j]
-                j -=1
+                j -= 1
 
             self[j + 1] = key
- 
-    def selecting_sort(self, reverse: bool = False) -> None:
+
+    def selection_sort(self, reverse: bool = False) -> None:
         n = len(self)
 
-        def from_less_to_more(extreme_elem, j_elem):
-            return extreme_elem > j_elem
+        def from_less_to_more(extereme_elem, j_elem):
+            return extereme_elem > j_elem
 
-        def from_more_to_less(extreme_elem, j_elem):
-            return extreme_elem < j_elem
+        def from_more_to_less(extereme_elem, j_elem):
+            return extereme_elem < j_elem
 
         perform_comparison = from_more_to_less if reverse else from_less_to_more
 
         for i in range(n - 1):
-            extereme = i
+            extreme_idx = i
 
             for j in range(i + 1, n):
-                if perform_comparison(self[extereme], self[j]):
-                    extereme = j
+                if perform_comparison(self[extreme_idx], self[j]):
+                    extreme_idx = j
+            
+            self[extreme_idx], self[i] = self[i], self[extreme_idx]
 
-            self[extereme], self[i] = self[i], self[extereme]
+    def linear_search(self, target: Any) -> int:
+        if type(target) != self.__type_elements: 
+            raise ValueError("the type of the element you are looking for must match the type of the array elements.")
 
-    
+        for i in range(len(self)):
+            if self[i] == target:
+                return i
+            
+        return -1
+
+    def binary_search(self, target: Any) -> None:
+        if type(target) != self.__type_elements: 
+            raise ValueError("the type of the element you are looking for must match the type of the array elements.")
+        if not self.is_sorted:
+            raise ValueError("Sort the array before using binary search")
+        
+        start = 0
+        end = len(self) - 1
+
+        while start <= end:
+            middle = (start + end) // 2
+
+            if self[middle] == target:
+                return middle
+            elif self[middle] < target:
+                start = middle + 1
+            else:
+                end = middle
+
+        return -1
+
 
 class DynamicArray(List):
     __type_elements: Type
@@ -128,27 +171,19 @@ class DynamicArray(List):
         
         super().__init__(args)
 
-def is_sorted(arr, reverse: bool = False):
-    answer = "Sorted"
-    ansi = "\033[37m\033[42m{}\033[0m"
-
-    for i in range(len(arr) - 1):
-        if (reverse and arr[i] < arr[i + 1]) or (not reverse and arr[i] > arr[i + 1]):
-            answer = "Not sorted"
-            ansi = "\033[37m\033[41m{}\033[0m"
-
-    print(ansi.format(answer))
-
 if __name__ == "__main__":
-    array = Array(type_elements=int, length=10)
-    # array: List = [None] * 10
     min_number = 56
     max_number = 6583
+    length = 10
 
+    array = Array(type_elements=int, length=length)
+    # array: List = [None] * 10
     for i in range(len(array)):
-        array[i] = floor((random() * (max_number - min_number + 1)) + min_number)
+        array[i] = randrange(min_number, max_number)
 
     print(array)
-    array.selecting_sort(reverse=True)
+    array.selection_sort(reverse=False)
     print(array)
-    is_sorted(array, reverse=True)
+    print(f"is sorted: {"\033[42m{}\033[0m".format(array.is_sorted)}")
+    target_elem = array[randrange(length)]
+    print(f"Element: {target_elem}, its index: {array.binary_search(target_elem)}")
