@@ -1,4 +1,4 @@
-from typing import Any, List, Iterable, SupportsIndex, Union, TypeVar, Type
+from typing import Any, List, Iterable, SupportsIndex, Tuple, TypeVar, Type
 from math import floor
 from random import randrange
 
@@ -6,11 +6,11 @@ _T = TypeVar("_T")
 
 # Classic array: static length, only one type of elements
 class Array(list):
-    __type_elements: Type
+    __type_elements: Tuple[Type]
 
-    def __init__(self, *args: Any, type_elements: Type, length: int = None):
+    def __init__(self, *args: Any, type_elements: Tuple[Type], length: int = None):
         self.__type_elements = type_elements
-        if not all(isinstance(arg, self.__type_elements) for arg in args):
+        if not all(arg in self.__type_elements for arg in args):
             raise ValueError(f"All array arguments must be of the same type, {self.__type_elements}")
         
         super().__init__(args)
@@ -36,7 +36,7 @@ class Array(list):
         pointer = 0
 
         while dicrement > 0:
-            if isinstance(self[dicrement], self.__type_elements):
+            if self[dicrement] in self.__type_elements:
                 if num_None: available_seats = True
                 break
             else:
@@ -130,8 +130,8 @@ class Array(list):
             self[extreme_idx], self[i] = self[i], self[extreme_idx]
 
     def linear_search(self, target: Any) -> int:
-        if type(target) != self.__type_elements: 
-            raise ValueError("the type of the element you are looking for must match the type of the array elements.")
+        if type(target) not in self.__type_elements: 
+            raise ValueError("the type of the element you are looking for must match the type of the array elements")
 
         for i in range(len(self)):
             if self[i] == target:
@@ -140,8 +140,8 @@ class Array(list):
         return -1
 
     def binary_search(self, target: Any) -> None:
-        if type(target) != self.__type_elements: 
-            raise ValueError("the type of the element you are looking for must match the type of the array elements.")
+        if type(target) not in self.__type_elements: 
+            raise ValueError("the type of the element you are looking for must match the type of the array elements")
         if not self.is_sorted:
             raise ValueError("Sort the array before using binary search")
         
@@ -162,14 +162,21 @@ class Array(list):
 
 
 class DynamicArray(List):
-    __type_elements: Type
+    __type_elements: Tuple[Type]
 
-    def __init__(self, *args, type_elements: Type):
+    def __init__(self, *args, type_elements: Tuple[Type]):
         self.__type_elements = type_elements
-        if not all(isinstance(arg, self.__type_elements) for arg in args):
+        if not all(arg in self.__type_elements for arg in args):
             raise ValueError("all array elements must be of the same type")
         
         super().__init__(args)
+
+    def append(self, elem: _T, /) -> None:
+        if type(elem) not in self.__type_elements: 
+            raise ValueError("the type of the element you are looking for must match the type of the array elements")
+        
+        super().append(elem)
+
 
 if __name__ == "__main__":
     min_number = 56
