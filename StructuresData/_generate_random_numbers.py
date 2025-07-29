@@ -1,5 +1,5 @@
 from random import randrange, randint
-from typing import Generator, List, Literal, Union
+from typing import List, Literal, Union
 
 MIN_NUM = 54
 MAX_NUM = 2032

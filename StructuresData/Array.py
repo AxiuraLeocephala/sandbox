@@ -2,7 +2,7 @@ from typing import Any, List, Iterable, SupportsIndex, Tuple, TypeVar, Type
 from math import floor
 from random import randrange
 
-from generate_random_numbers import generate_random_numbers
+from StructuresData._generate_random_numbers import generate_random_numbers
 
 _T = TypeVar("_T")
 
