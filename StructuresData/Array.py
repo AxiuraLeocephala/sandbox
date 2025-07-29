@@ -9,7 +9,7 @@ class Array(list):
     __type_elements: Tuple[Type]
 
     def __init__(self, *args: Any, type_elements: Tuple[Type], length: int = None):
-        self.__type_elements = type_elements
+        self.__type_elements = (type_elements,)
         if not all(arg in self.__type_elements for arg in args):
             raise ValueError(f"All array arguments must be of the same type, {self.__type_elements}")
         
@@ -165,7 +165,8 @@ class DynamicArray(List):
     __type_elements: Tuple[Type]
 
     def __init__(self, *args, type_elements: Tuple[Type]):
-        self.__type_elements = type_elements
+        self.__type_elements = (type_elements,)
+
         if not all(arg in self.__type_elements for arg in args):
             raise ValueError("all array elements must be of the same type")
         
@@ -176,6 +177,10 @@ class DynamicArray(List):
             raise ValueError("the type of the element you are looking for must match the type of the array elements")
         
         super().append(elem)
+
+    @property
+    def is_empty(self) -> bool:
+        return False if self else True 
 
 
 if __name__ == "__main__":
