@@ -2,6 +2,8 @@ from typing import Any, List, Iterable, SupportsIndex, Tuple, TypeVar, Type
 from math import floor
 from random import randrange
 
+from generate_random_numbers import generate_random_numbers
+
 _T = TypeVar("_T")
 
 # Classic array: static length, only one type of elements
@@ -184,14 +186,12 @@ class DynamicArray(List):
 
 
 if __name__ == "__main__":
-    min_number = 56
-    max_number = 6583
     length = 10
 
     array = Array(type_elements=int, length=length)
     # array: List = [None] * 10
-    for i in range(len(array)):
-        array[i] = randrange(min_number, max_number)
+    for i in range(length):
+        array[i] = generate_random_numbers(mode_return="one")
 
     print(array)
     array.selection_sort(reverse=False)
