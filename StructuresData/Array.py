@@ -141,7 +141,7 @@ class Array(list):
             
         return -1
 
-    def binary_search(self, target: Any) -> None:
+    def binary_search(self, target: Any) -> int:
         if type(target) not in self.__type_elements: 
             raise ValueError("the type of the element you are looking for must match the type of the array elements")
         if not self.is_sorted:
@@ -163,7 +163,7 @@ class Array(list):
         return -1
 
 
-class DynamicArray(List):
+class DynamicArray(list):
     __type_elements: Tuple[Type]
 
     def __init__(self, *args, type_elements: Tuple[Type]):
