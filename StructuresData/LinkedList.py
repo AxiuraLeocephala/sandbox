@@ -172,7 +172,7 @@ if __name__ == "__main__":
     linked_list = LinkedList("doubly")
     
     number_nodes = 6
-    for d in range(0, 6):
+    for d in range(5, -1, -1):
         linked_list.insert_at_end(f'data_{d}.0')
 
     print(linked_list)

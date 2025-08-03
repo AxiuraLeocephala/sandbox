@@ -1,8 +1,9 @@
+from array import array
 from typing import Any, List, Iterable, SupportsIndex, Tuple, TypeVar, Type
 from math import floor
 from random import randrange
 
-from StructuresData._generate_random_numbers import generate_random_numbers
+from _generate_random_numbers import generate_random_numbers
 
 _T = TypeVar("_T")
 
@@ -188,14 +189,17 @@ class DynamicArray(list):
 if __name__ == "__main__":
     length = 10
 
-    array = Array(type_elements=int, length=length)
+    user_array = Array(type_elements=int, length=length)
     # array: List = [None] * 10
     for i in range(length):
-        array[i] = generate_random_numbers(mode_return="one")
+        user_array[i] = generate_random_numbers(mode_return="one")
 
-    print(array)
-    array.selection_sort(reverse=False)
-    print(array)
-    print(f"is sorted: {"\033[42m{}\033[0m".format(array.is_sorted)}")
-    target_elem = array[randrange(length)]
-    print(f"Element: {target_elem}, its index: {array.binary_search(target_elem)}")
+    print(user_array)
+    user_array.selection_sort(reverse=False)
+    print(user_array)
+    print(f"is sorted: {"\033[42m{}\033[0m".format(user_array.is_sorted)}")
+    target_elem = user_array[randrange(length)]
+    print(f"Element: {target_elem}, its index: {user_array.binary_search(target_elem)}")
+
+    array_num = array('i', [0, 1, 2, 3, 4])
+    print(array_num)
