@@ -49,5 +49,3 @@ try:
     v_3 = new_dict.pop(0)
 except KeyError as error:
     logging.warning("такого ключа нет")
-
-print(v_1, v_2, new_dict)
