@@ -1,12 +1,13 @@
-from typing import Any, Union, Literal, SupportsIndex
+import inspect
+from typing import Any, Union, Literal, List, SupportsIndex
 
 from _generate_random_numbers import generate_random_numbers
 
 class Node:
-    def __init__(self, data, *, next = None, prev = None):
+    def __init__(self, data, *, next: List = [], prev: List = []):
         self.data = data
-        self.prev = prev
-        self.next = next
+        self.prev: List[Any] = prev
+        self.next: List[Any] = next
 
 class LinkedList:
     def __init__(self, type_list: Literal["singly", "doubly"]):
@@ -16,14 +17,29 @@ class LinkedList:
         self.tail = None
 
     def __call__(self) -> str:
-        output_string = "" 
-
         current_node = self.head
-        while current_node:
-            output_string += f'{current_node.data} -> ' 
-            current_node = current_node.next
-        output_string += f"None\n\033[0;33;40m type:\033[0;37;40m {self.type_list}\n\033[0;33;40m is looped:\033[0;37;40m {self.is_looped}"
+        output_string = ""
+
+        def traversing() -> None:
+            nonlocal current_node
+            nonlocal output_string
+
+            output_string += current_node.data
+            if current_node.next:
+                for node in current_node.next:
+                    if (not node.prev is []) and current_node in node.prev:
+                        output_string += f" <-> {node.data}\n"
+                    else:
+                        output_string += f" -> {node.data}\n"
                 
+                for node in current_node.next:
+                    current_node = node
+                    traversing()
+            else:
+                output_string += " -> None"
+
+        traversing()
+
         return output_string
 
     def __str__(self) -> str:
@@ -44,13 +60,12 @@ class LinkedList:
 
         return i 
 
-
     def insert_at_begin(self, data: Any) -> None:
         new_node = Node(data)
         if self.head:
-            new_node.next = self.head
+            new_node.next = [self.head]
             if self.type_list == "doubly":
-                self.head.prev = new_node
+                self.head.prev = [new_node]
         
         self.head = new_node
 
@@ -58,29 +73,40 @@ class LinkedList:
             self.tail = self.head
 
     def insert_at_index(self, data: Any, index: SupportsIndex) -> None:
+        # TODO если index = 0 и вызов из графа ?
         if not index: 
             self.insert_at_begin(data)
             return
         if self.is_empty:
-            raise TypeError("linked list is empty")
-                
-        new_node = Node(data)
-        i = 0
+            raise TypeError("collection is empty")
+
         current_node = self.head
+        i = 0
+        def travesing():
+            nonlocal current_node
+            nonlocal i
 
-        while i < index:
-            current_node = current_node.next
-            if not current_node:
-                if i + 1 == index:
-                    del new_node
-                    self.insert_at_end(data)
-                    return
-                raise ValueError("index out of range")
-            i += 1
+            for node in current_node.next:
+                cn = node
+                i += 1
 
-        current_node.prev.next, new_node.next = new_node, current_node
-        if self.type_list == "doubly":
-            current_node.prev, new_node.prev = new_node, current_node.prev
+                if i == index: break
+            else:
+                for node in current_node.next:
+                    current_node = node
+                    travesing()
+
+            current_node = cn
+
+        travesing()
+
+        print(current_node.data)
+
+        # new_node = Node(data)
+        
+        # current_node.prev.next, new_node.next = new_node, current_node
+        # if self.type_list == "doubly":
+        #     current_node.prev, new_node.prev = new_node, current_node.prev
 
     def insert_at_end(self, data: Any) -> None:
         new_node = Node(data)
@@ -171,8 +197,13 @@ class LinkedList:
 if __name__ == "__main__":
     linked_list = LinkedList("doubly")
     
-    number_nodes = 6
-    for d in range(5, -1, -1):
-        linked_list.insert_at_end(f'data_{d}.0')
+    number_nodes = 5
+    for d in range(number_nodes - 1, -1, -1):
+        linked_list.insert_at_begin(f'{d}')
 
-    print(linked_list)
+    print(linked_list, end="\n\n")
+
+    linked_list.insert_at_index("", 3)
+
+
+
