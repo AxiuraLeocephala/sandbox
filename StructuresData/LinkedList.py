@@ -1,4 +1,5 @@
 import inspect
+from datetime import time
 from typing import Any, Union, Literal, List, SupportsIndex
 
 from _generate_random_numbers import generate_random_numbers
@@ -20,10 +21,7 @@ class LinkedList:
         current_node = self.head
         output_string = ""
 
-        def traversing() -> None:
-            nonlocal current_node
-            nonlocal output_string
-
+        def traversing(current_node: Node, output_string: str) -> None:
             output_string += current_node.data
             if current_node.next:
                 for node in current_node.next:
@@ -33,16 +31,16 @@ class LinkedList:
                         output_string += f" -> {node.data}\n"
                 
                 for node in current_node.next:
-                    current_node = node
-                    traversing()
+                    traversing(node, output_string)
             else:
                 output_string += " -> None"
 
-        traversing()
+        traversing(current_node, output_string)
 
         return output_string
 
     def __str__(self) -> str:
+        return ""
         return self()
     
     @property
@@ -63,9 +61,13 @@ class LinkedList:
     def insert_at_begin(self, data: Any) -> None:
         new_node = Node(data)
         if self.head:
-            new_node.next = [self.head]
+            print(new_node.data, " | ", [node.data for node in self.head.prev], self.head.data, [node.data for node in self.head.next])
+        else:
+            print(new_node.data, "no head")
+        if self.head:
+            new_node.next.append(self.head)
             if self.type_list == "doubly":
-                self.head.prev = [new_node]
+                self.head.prev.append(new_node)
         
         self.head = new_node
 
@@ -73,9 +75,26 @@ class LinkedList:
             self.tail = self.head
 
     def insert_at_index(self, data: Any, index: SupportsIndex) -> None:
-        # TODO если index = 0 и вызов из графа ?
-        if not index: 
-            self.insert_at_begin(data)
+        caller = ""
+        flag = False
+        i = 0
+
+        for char in reversed(inspect.stack()[1].filename):
+            if flag: 
+                if char == "\\": break
+                caller = char + caller
+
+            if char == ".": flag = True
+
+        if not index:
+            if caller == "graph":
+                new_node = Node(data)
+                self.head.next.append(new_node)
+
+                if self.type_list == "doubly":
+                    new_node.prev.append(self.head)
+            else:
+                self.insert_at_begin(data)
             return
         if self.is_empty:
             raise TypeError("collection is empty")
@@ -95,20 +114,33 @@ class LinkedList:
                             return node
                     return None
             else:
+                nonlocal caller
+                if i + 1 == index and caller == "linkedlist":
+                    self.insert_at_end(data)
+                    return
                 return None
 
-        node = travesing(current_node, i, index)
+        target_node = travesing(current_node, i, index)
 
-        if node:
-            print(node.data)
+        if not target_node:
+            if caller == "linkedlist":
+                raise ValueError("index out of range")
+            elif caller == "graph":
+                raise ValueError("no node with the specified injector was found")
+            else:
+                raise ValueError("1. unknown name of caller\n2. index out of range") 
+
+        new_node = Node(data)
+
+        if caller == "linkedlist":
+            print(target_node.data)
+            # current_node.prev.next, new_node.next = new_node, current_node
+            # if self.type_list == "doubly":
+            #     current_node.prev, new_node.prev = new_node, current_node.prev
+        elif caller == "graph":
+            print()
         else:
-            print("None")
-
-        # new_node = Node(data)
-        
-        # current_node.prev.next, new_node.next = new_node, current_node
-        # if self.type_list == "doubly":
-        #     current_node.prev, new_node.prev = new_node, current_node.prev
+            raise TypeError("unknown name of caller")
 
     def insert_at_end(self, data: Any) -> None:
         new_node = Node(data)
@@ -198,7 +230,7 @@ class LinkedList:
 
 if __name__ == "__main__":
     linked_list = LinkedList("doubly")
-    
+
     number_nodes = 5
     for d in range(number_nodes - 1, -1, -1):
         linked_list.insert_at_begin(f'{d}')
@@ -206,6 +238,3 @@ if __name__ == "__main__":
     print(linked_list, end="\n\n")
 
     linked_list.insert_at_index("", 5)
-
-
-
