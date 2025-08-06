@@ -82,25 +82,27 @@ class LinkedList:
 
         current_node = self.head
         i = 0
-        def travesing():
-            nonlocal current_node
-            nonlocal i
-
-            for node in current_node.next:
-                cn = node
-                i += 1
-
-                if i == index: break
-            else:
+        def travesing(current_node: Node, i: int, index: int) -> Union[Node, None]:
+            if current_node.next:
                 for node in current_node.next:
-                    current_node = node
-                    travesing()
+                    i += 1
+                    if i == index:
+                        return node
+                else:
+                    for node in current_node.next:
+                        node = travesing(node, i, index)
+                        if node:
+                            return node
+                    return None
+            else:
+                return None
 
-            current_node = cn
+        node = travesing(current_node, i, index)
 
-        travesing()
-
-        print(current_node.data)
+        if node:
+            print(node.data)
+        else:
+            print("None")
 
         # new_node = Node(data)
         
@@ -203,7 +205,7 @@ if __name__ == "__main__":
 
     print(linked_list, end="\n\n")
 
-    linked_list.insert_at_index("", 3)
+    linked_list.insert_at_index("", 5)
 
 
 
