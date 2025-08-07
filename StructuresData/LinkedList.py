@@ -1,14 +1,19 @@
 import inspect
-from datetime import time
 from typing import Any, Union, Literal, List, SupportsIndex
 
 from _generate_random_numbers import generate_random_numbers
 
 class Node:
-    def __init__(self, data, *, next: List = [], prev: List = []):
+    # def __init__(self, data, *, next: List = [], prev: List = []): 
+    # Список - мутабельный объект, при использовании его в качестве 
+    # дефолтного значения параметра он будет общим для всех экземпляров
+    # класса. Изменяя значение, например, next у одного экземпляра,
+    # это изменение будет видно и у других экземпляров - фактически
+    # изменяется один и тот же объект 
+    def __init__(self, data, *, next: List = None, prev: List = None):
         self.data = data
-        self.prev: List[Any] = prev
-        self.next: List[Any] = next
+        self.next: List[Any] = next if next else []
+        self.prev: List[Any] = prev if prev else []
 
 class LinkedList:
     def __init__(self, type_list: Literal["singly", "doubly"]):
@@ -21,7 +26,7 @@ class LinkedList:
         current_node = self.head
         output_string = ""
 
-        def traversing(current_node: Node, output_string: str) -> None:
+        def traversing(current_node: Node, output_string: str) -> str:
             output_string += current_node.data
             if current_node.next:
                 for node in current_node.next:
@@ -31,16 +36,18 @@ class LinkedList:
                         output_string += f" -> {node.data}\n"
                 
                 for node in current_node.next:
-                    traversing(node, output_string)
+                    output_string = traversing(node, output_string)
+
+                return output_string
             else:
                 output_string += " -> None"
+                return output_string
 
-        traversing(current_node, output_string)
+        output_string = traversing(current_node, output_string)
 
         return output_string
 
     def __str__(self) -> str:
-        return ""
         return self()
     
     @property
@@ -60,10 +67,7 @@ class LinkedList:
 
     def insert_at_begin(self, data: Any) -> None:
         new_node = Node(data)
-        if self.head:
-            print(new_node.data, " | ", [node.data for node in self.head.prev], self.head.data, [node.data for node in self.head.next])
-        else:
-            print(new_node.data, "no head")
+
         if self.head:
             new_node.next.append(self.head)
             if self.type_list == "doubly":
@@ -95,6 +99,7 @@ class LinkedList:
                     new_node.prev.append(self.head)
             else:
                 self.insert_at_begin(data)
+
             return
         if self.is_empty:
             raise TypeError("collection is empty")
@@ -120,9 +125,9 @@ class LinkedList:
                     return
                 return None
 
-        target_node = travesing(current_node, i, index)
+        current_node = travesing(current_node, i, index)
 
-        if not target_node:
+        if not current_node:
             if caller == "linkedlist":
                 raise ValueError("index out of range")
             elif caller == "graph":
@@ -133,12 +138,15 @@ class LinkedList:
         new_node = Node(data)
 
         if caller == "linkedlist":
-            print(target_node.data)
-            # current_node.prev.next, new_node.next = new_node, current_node
-            # if self.type_list == "doubly":
-            #     current_node.prev, new_node.prev = new_node, current_node.prev
+            current_node.prev[0].next = [new_node]
+            new_node.next = [current_node]
+            if self.type_list == "doubly":
+                current_node.prev = [new_node] 
+                new_node.prev = [current_node.prev[0]]
         elif caller == "graph":
-            print()
+            current_node.next.append(new_node)
+            if self.type_list == "doubly":
+                new_node.prev.append(current_node)
         else:
             raise TypeError("unknown name of caller")
 
@@ -235,6 +243,8 @@ if __name__ == "__main__":
     for d in range(number_nodes - 1, -1, -1):
         linked_list.insert_at_begin(f'{d}')
 
-    print(linked_list, end="\n\n")
+    print(linked_list)
 
-    linked_list.insert_at_index("", 5)
+    linked_list.insert_at_index("5", 4)
+
+    print(linked_list)
