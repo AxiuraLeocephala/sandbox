@@ -2,6 +2,7 @@ import inspect
 from typing import Any, Union, Literal, List, SupportsIndex
 
 from _generate_random_numbers import generate_random_numbers
+from models.DataNode import DataNode
 
 class Node:
     # def __init__(self, data, *, next: List = [], prev: List = []): 
@@ -10,7 +11,7 @@ class Node:
     # класса. Изменяя значение, например, next у одного экземпляра,
     # это изменение будет видно и у других экземпляров - фактически
     # изменяется один и тот же объект 
-    def __init__(self, data, *, next: List = None, prev: List = None):
+    def __init__(self, data: Any, *, next: List = None, prev: List = None):
         self.data = data
         self.next: List[Any] = next if next else []
         self.prev: List[Any] = prev if prev else []
@@ -29,18 +30,22 @@ class LinkedList:
         def traversing(current_node: Node, output_string: str) -> str:
             output_string += current_node.data
             if current_node.next:
+                flag = False
                 for node in current_node.next:
+                    if flag: 
+                        output_string += " "
                     if (not node.prev is []) and current_node in node.prev:
                         output_string += f" <-> {node.data}\n"
                     else:
                         output_string += f" -> {node.data}\n"
+                    flag = True
                 
                 for node in current_node.next:
                     output_string = traversing(node, output_string)
 
                 return output_string
             else:
-                output_string += " -> None"
+                output_string += " -> None\n"
                 return output_string
 
         output_string = traversing(current_node, output_string)
@@ -141,8 +146,8 @@ class LinkedList:
             current_node.prev[0].next = [new_node]
             new_node.next = [current_node]
             if self.type_list == "doubly":
-                current_node.prev = [new_node] 
                 new_node.prev = [current_node.prev[0]]
+                current_node.prev = [new_node]
         elif caller == "graph":
             current_node.next.append(new_node)
             if self.type_list == "doubly":

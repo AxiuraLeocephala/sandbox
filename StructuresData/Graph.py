@@ -40,11 +40,13 @@ class Graph(LinkedList):
         super().insert_at_index(data, index)
 
 if __name__ == "__main__":
-    number_node = 2
+    number_node = 5
     graph = Graph()
 
-    for i in range(number_node, 0, -1):
+    for i in range(number_node - 1, -1, -1):
         graph.insert_at_begin(f"{i}")
 
-    graph.insert_at_index("11", 5)
+    graph.insert_at_index("5", 2)
+    graph.insert_at_index("6", 2)
+    graph.insert_at_index("7", 2)
     print(graph)
