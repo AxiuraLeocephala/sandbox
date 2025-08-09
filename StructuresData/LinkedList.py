@@ -1,11 +1,11 @@
 import inspect
-from typing import Any, Union, Literal, List, SupportsIndex
+from typing import Any, Union, Literal, List, Set, SupportsIndex
 
 from _generate_random_numbers import generate_random_numbers
 from models.DataNode import DataNode
 
 class Node:
-    # def __init__(self, data, *, next: List = [], prev: List = []): 
+    # !!! def __init__(self, data, *, next: List = [], prev: List = []): 
     # Список - мутабельный объект, при использовании его в качестве 
     # дефолтного значения параметра он будет общим для всех экземпляров
     # класса. Изменяя значение, например, next у одного экземпляра,
@@ -83,10 +83,13 @@ class LinkedList:
         if not self.tail:
             self.tail = self.head
 
-    def insert_at_index(self, data: Any, index: SupportsIndex) -> None:
+    def insert_at_index(self, data: Any, index: Union[Set[SupportsIndex], SupportsIndex]) -> None:
+        if self.is_empty:
+            raise TypeError("collection is empty")
+        
         caller = ""
         flag = False
-        i = 0
+        new_node = Node(data)
 
         for char in reversed(inspect.stack()[1].filename):
             if flag: 
@@ -95,22 +98,32 @@ class LinkedList:
 
             if char == ".": flag = True
 
-        if not index:
-            if caller == "graph":
-                new_node = Node(data)
-                self.head.next.append(new_node)
+        def is_index_zero(index: int, new_node: Node) -> bool:
+            if not index:
+                if caller == "graph":
+                    self.head.next.append(new_node)
 
-                if self.type_list == "doubly":
-                    new_node.prev.append(self.head)
+                    if self.type_list == "doubly":
+                        new_node.prev.append(self.head)
+                    
+                    return True
+                else:
+                    self.insert_at_begin(new_node.data)
+                    del new_node
+                    return True
             else:
-                self.insert_at_begin(data)
+                return False
 
-            return
-        if self.is_empty:
-            raise TypeError("collection is empty")
+        if isinstance(index, int):
+            if is_index_zero(index, new_node): return
+            else: index = (index,)
+        elif len(index) == 1:
+            if is_index_zero(*index, new_node): return
+            else: index = tuple(index)
+        else:
+            for e in index:
+                if is_index_zero(e, new_node): break
 
-        current_node = self.head
-        i = 0
         def travesing(current_node: Node, i: int, index: int) -> Union[Node, None]:
             if current_node.next:
                 for node in current_node.next:
@@ -130,30 +143,31 @@ class LinkedList:
                     return
                 return None
 
-        current_node = travesing(current_node, i, index)
+        for idx in index:
+            current_node = self.head
+            i = 0
+            current_node = travesing(current_node, i, idx)
 
-        if not current_node:
+            if not current_node:
+                if caller == "linkedlist":
+                    raise ValueError(f"index {idx} out of range")
+                elif caller == "graph":
+                    raise ValueError(f"no node with the specified injector {idx} was found")
+                else:
+                    raise ValueError(f"1. unknown name of caller\n2. index {idx} out of range") 
+
             if caller == "linkedlist":
-                raise ValueError("index out of range")
+                current_node.prev[0].next = [new_node]
+                new_node.next = [current_node]
+                if self.type_list == "doubly":
+                    new_node.prev = [current_node.prev[0]]
+                    current_node.prev = [new_node]
             elif caller == "graph":
-                raise ValueError("no node with the specified injector was found")
+                current_node.next.append(new_node)
+                if self.type_list == "doubly":
+                    new_node.prev.append(current_node)
             else:
-                raise ValueError("1. unknown name of caller\n2. index out of range") 
-
-        new_node = Node(data)
-
-        if caller == "linkedlist":
-            current_node.prev[0].next = [new_node]
-            new_node.next = [current_node]
-            if self.type_list == "doubly":
-                new_node.prev = [current_node.prev[0]]
-                current_node.prev = [new_node]
-        elif caller == "graph":
-            current_node.next.append(new_node)
-            if self.type_list == "doubly":
-                new_node.prev.append(current_node)
-        else:
-            raise TypeError("unknown name of caller")
+                raise TypeError("unknown name of caller")
 
     def insert_at_end(self, data: Any) -> None:
         new_node = Node(data)

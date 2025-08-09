@@ -35,9 +35,15 @@ class Graph(LinkedList):
     
     def insert_after_index(self, data: Any, index: SupportsIndex) -> None:
         '''
-        Новый узел будет связан с узлом, имеющий указанный индекс 
+        Args:
+        data : Any
+            Данные, которые будут храниться в узле.
+        index : SupportsIndex
+            Индекс узла, после которого будет вставлен новый узел. 
         '''
         super().insert_at_index(data, index)
+
+    
 
 if __name__ == "__main__":
     number_node = 5
@@ -46,7 +52,8 @@ if __name__ == "__main__":
     for i in range(number_node - 1, -1, -1):
         graph.insert_at_begin(f"{i}")
 
-    graph.insert_at_index("5", 2)
-    graph.insert_at_index("6", 2)
-    graph.insert_at_index("7", 2)
+    graph.insert_at_index("5", 4)
+    graph.insert_at_index("6", 4)
+    graph.insert_at_index("7", 4)
+    graph.insert_at_index("8", {5, 6, 7})
     print(graph)
