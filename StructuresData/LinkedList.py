@@ -1,20 +1,6 @@
-import inspect
-from typing import Any, Union, Literal, List, Set, SupportsIndex
+from typing import Any, Union, Literal, SupportsIndex
 
-from _generate_random_numbers import generate_random_numbers
-from models.DataNode import DataNode
-
-class Node:
-    # !!! def __init__(self, data, *, next: List = [], prev: List = []): 
-    # Список - мутабельный объект, при использовании его в качестве 
-    # дефолтного значения параметра он будет общим для всех экземпляров
-    # класса. Изменяя значение, например, next у одного экземпляра,
-    # это изменение будет видно и у других экземпляров - фактически
-    # изменяется один и тот же объект 
-    def __init__(self, data: Any, *, next: List = None, prev: List = None):
-        self.data = data
-        self.next: List[Any] = next if next else []
-        self.prev: List[Any] = prev if prev else []
+from models.Vertex import Vertex
 
 class LinkedList:
     def __init__(self, type_list: Literal["singly", "doubly"]):
@@ -23,37 +9,16 @@ class LinkedList:
         self.head = None
         self.tail = None
 
-    def __call__(self) -> str:
+    def __str__(self) -> str:
+        output_string = "" 
         current_node = self.head
-        output_string = ""
-
-        def traversing(current_node: Node, output_string: str) -> str:
-            output_string += current_node.data
-            if current_node.next:
-                flag = False
-                for node in current_node.next:
-                    if flag: 
-                        output_string += " "
-                    if (not node.prev is []) and current_node in node.prev:
-                        output_string += f" <-> {node.data}\n"
-                    else:
-                        output_string += f" -> {node.data}\n"
-                    flag = True
-                
-                for node in current_node.next:
-                    output_string = traversing(node, output_string)
-
-                return output_string
-            else:
-                output_string += " -> None\n"
-                return output_string
-
-        output_string = traversing(current_node, output_string)
+        
+        while current_node:
+            output_string += f'{current_node.data} -> ' 
+            current_node = current_node.next
+        output_string += "None"
 
         return output_string
-
-    def __str__(self) -> str:
-        return self()
     
     @property
     def is_empty(self) -> bool:
@@ -70,107 +35,49 @@ class LinkedList:
 
         return i 
 
-    def insert_at_begin(self, data: Any) -> None:
-        new_node = Node(data)
 
+    def insert_at_begin(self, data: Any) -> None:
+        new_node = Vertex(data)
         if self.head:
-            new_node.next.append(self.head)
+            new_node.next = self.head
             if self.type_list == "doubly":
-                self.head.prev.append(new_node)
+                self.head.prev = new_node
         
         self.head = new_node
 
         if not self.tail:
             self.tail = self.head
 
-    def insert_at_index(self, data: Any, index: Union[Set[SupportsIndex], SupportsIndex]) -> None:
+        return new_node
+
+    def insert_at_index(self, data: Any, index: SupportsIndex) -> None:
+        if not index: 
+            self.insert_at_begin(data)
+            return
         if self.is_empty:
             raise TypeError("collection is empty")
-        
-        caller = ""
-        flag = False
-        new_node = Node(data)
-
-        for char in reversed(inspect.stack()[1].filename):
-            if flag: 
-                if char == "\\": break
-                caller = char + caller
-
-            if char == ".": flag = True
-
-        def is_index_zero(index: int, new_node: Node) -> bool:
-            if not index:
-                if caller == "graph":
-                    self.head.next.append(new_node)
-
-                    if self.type_list == "doubly":
-                        new_node.prev.append(self.head)
-                    
-                    return True
-                else:
-                    self.insert_at_begin(new_node.data)
-                    del new_node
-                    return True
-            else:
-                return False
-
-        if isinstance(index, int):
-            if is_index_zero(index, new_node): return
-            else: index = (index,)
-        elif len(index) == 1:
-            if is_index_zero(*index, new_node): return
-            else: index = tuple(index)
-        else:
-            for e in index:
-                if is_index_zero(e, new_node): break
-
-        def travesing(current_node: Node, i: int, index: int) -> Union[Node, None]:
-            if current_node.next:
-                for node in current_node.next:
-                    i += 1
-                    if i == index:
-                        return node
-                else:
-                    for node in current_node.next:
-                        node = travesing(node, i, index)
-                        if node:
-                            return node
-                    return None
-            else:
-                nonlocal caller
-                if i + 1 == index and caller == "linkedlist":
+                
+        i = 0
+        current_node = self.head
+        while i < index:
+            current_node = current_node.next
+            if not current_node:
+                if i + 1 == index:
                     self.insert_at_end(data)
                     return
-                return None
+                raise ValueError("index out of range")
+            i += 1
 
-        for idx in index:
-            current_node = self.head
-            i = 0
-            current_node = travesing(current_node, i, idx)
+        new_node = Vertex(data)
 
-            if not current_node:
-                if caller == "linkedlist":
-                    raise ValueError(f"index {idx} out of range")
-                elif caller == "graph":
-                    raise ValueError(f"no node with the specified injector {idx} was found")
-                else:
-                    raise ValueError(f"1. unknown name of caller\n2. index {idx} out of range") 
+        current_node.prev.next, new_node.next = new_node, current_node
+        if self.type_list == "doubly":
+            current_node.prev, new_node.prev = new_node, current_node.prev
 
-            if caller == "linkedlist":
-                current_node.prev[0].next = [new_node]
-                new_node.next = [current_node]
-                if self.type_list == "doubly":
-                    new_node.prev = [current_node.prev[0]]
-                    current_node.prev = [new_node]
-            elif caller == "graph":
-                current_node.next.append(new_node)
-                if self.type_list == "doubly":
-                    new_node.prev.append(current_node)
-            else:
-                raise TypeError("unknown name of caller")
+        return new_node
 
     def insert_at_end(self, data: Any) -> None:
-        new_node = Node(data)
+        new_node = Vertex(data)
 
         if self.tail:
             self.tail.next = new_node
@@ -182,9 +89,11 @@ class LinkedList:
         if not self.head:
             self.head = self.tail
 
+        return new_node
+
     def change_data(self, new_data: Any, index: SupportsIndex) -> None:
         if self.is_empty:
-            raise TypeError("linked list is empty")
+            raise TypeError("collection is empty")
         i = 0
         current_node = self.head
 
@@ -198,7 +107,7 @@ class LinkedList:
 
     def remove_first_node(self) -> None:
         if self.is_empty:
-            raise TypeError("linked list is empty")
+            raise TypeError("collection is empty")
         
         next_node = self.head.next
         if next_node:
@@ -213,7 +122,7 @@ class LinkedList:
             self.remove_first_node()
             return
         if self.is_empty:
-            raise TypeError("linked list is empty")
+            raise TypeError("collection is empty")
         
         i = 0
         current_node = self.head
@@ -233,7 +142,7 @@ class LinkedList:
 
     def remove_last_node(self) -> None:
         if self.is_empty:
-            raise TypeError("linked list is empty")
+            raise TypeError("collection is empty")
         
         prev_node = self.tail.prev
         if prev_node:
@@ -243,9 +152,9 @@ class LinkedList:
 
         self.tail = prev_node
 
-    def search(self, required_data: Any) -> Union[Node, None]:
+    def search(self, required_data: Any) -> Union[Vertex, None]:
         if self.is_empty:
-            raise TypeError("linked list is empty")
+            raise TypeError("collection is empty")
         
         current_node = self.head
         while current_node:
@@ -257,13 +166,9 @@ class LinkedList:
 
 if __name__ == "__main__":
     linked_list = LinkedList("doubly")
-
-    number_nodes = 5
-    for d in range(number_nodes - 1, -1, -1):
-        linked_list.insert_at_begin(f'{d}')
-
-    print(linked_list)
-
-    linked_list.insert_at_index("5", 4)
+    
+    number_nodes = 6
+    for d in range(5, -1, -1):
+        linked_list.insert_at_end(f'data_{d}.0')
 
     print(linked_list)
