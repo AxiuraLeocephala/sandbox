@@ -36,8 +36,9 @@ class LinkedList:
         return i 
 
 
-    def insert_at_begin(self, data: Any) -> None:
+    def insert_at_begin(self, data: Any) -> Vertex:
         new_node = Vertex(data)
+
         if self.head:
             new_node.next = self.head
             if self.type_list == "doubly":
@@ -50,7 +51,7 @@ class LinkedList:
 
         return new_node
 
-    def insert_at_index(self, data: Any, index: SupportsIndex) -> None:
+    def insert_at_index(self, data: Any, index: SupportsIndex) -> Vertex:
         if not index: 
             self.insert_at_begin(data)
             return
@@ -76,7 +77,7 @@ class LinkedList:
 
         return new_node
 
-    def insert_at_end(self, data: Any) -> None:
+    def insert_at_end(self, data: Any) -> Vertex:
         new_node = Vertex(data)
 
         if self.tail:
@@ -105,7 +106,7 @@ class LinkedList:
 
         current_node.data = new_data
 
-    def remove_first_node(self) -> None:
+    def remove_first_vertex(self) -> None:
         if self.is_empty:
             raise TypeError("collection is empty")
         
@@ -117,7 +118,7 @@ class LinkedList:
         
         self.head = next_node
 
-    def remove_node(self, index: SupportsIndex) -> None:
+    def remove_vertex(self, index: SupportsIndex) -> None:
         if not index:
             self.remove_first_node()
             return
@@ -140,7 +141,7 @@ class LinkedList:
         if self.type_list == "doubly":
             current_node.next.prev = current_node.prev
 
-    def remove_last_node(self) -> None:
+    def remove_last_vertex(self) -> None:
         if self.is_empty:
             raise TypeError("collection is empty")
         

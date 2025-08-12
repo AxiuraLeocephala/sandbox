@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from StructuresData.models.Vertex import Node
+from models.Vertex import Vertex
 
 @dataclass
 class Edge:
-    def __init__(self, outgoing_node: Node, incoming_node: Node):
-        self.outgoing_node = outgoing_node
-        self.incoming_node = incoming_node
+    def __init__(self, outgoing_vertex: Vertex, incoming_vertex: Vertex):
+        self.outgoing_vertex = outgoing_vertex
+        self.incoming_vertex = incoming_vertex
