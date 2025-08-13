@@ -1,11 +1,10 @@
-from dataclasses import dataclass
-from typing import Union, List
-from uuid import UUID
+from dataclasses import dataclass, field
+from typing import List
 
 from models.Edge import Edge
 
 @dataclass
 class ListEdges:
-    def __init__(self, id: Union[UUID, int]):
-        self.id = id
-        self.list_edges: List[Edge] = []
+    # Для избежания установки общего значения для всех экземпляров 
+    # используется функция field c параметром default_factory
+    list_edges: List[Edge] = field(default_factory=list)

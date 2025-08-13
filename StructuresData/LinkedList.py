@@ -1,4 +1,5 @@
 from typing import Any, Union, Literal, SupportsIndex
+from uuid import UUID
 
 from models.Vertex import Vertex
 
@@ -36,8 +37,8 @@ class LinkedList:
         return i 
 
 
-    def insert_at_begin(self, data: Any) -> Vertex:
-        new_node = Vertex(data)
+    def insert_at_begin(self, node_id: Union[UUID, int], data: Any) -> Vertex:
+        new_node = Vertex(node_id, data)
 
         if self.head:
             new_node.next = self.head
@@ -51,7 +52,7 @@ class LinkedList:
 
         return new_node
 
-    def insert_at_index(self, data: Any, index: SupportsIndex) -> Vertex:
+    def insert_at_index(self, node_id: Union[UUID, int], data: Any, index: SupportsIndex) -> Vertex:
         if not index: 
             self.insert_at_begin(data)
             return
@@ -69,7 +70,7 @@ class LinkedList:
                 raise ValueError("index out of range")
             i += 1
 
-        new_node = Vertex(data)
+        new_node = Vertex(node_id, data)
 
         current_node.prev.next, new_node.next = new_node, current_node
         if self.type_list == "doubly":
@@ -77,8 +78,8 @@ class LinkedList:
 
         return new_node
 
-    def insert_at_end(self, data: Any) -> Vertex:
-        new_node = Vertex(data)
+    def insert_at_end(self, node_id: Union[UUID, int], data: Any) -> Vertex:
+        new_node = Vertex(node_id, data)
 
         if self.tail:
             self.tail.next = new_node

@@ -27,11 +27,11 @@ class Graph(LinkedList):
         output_string = ""
 
         while current_vertex:
-            len_str_current_vertex = len(str(current_vertex.data.id))
-            output_string += f"{current_vertex.data.id}"
+            len_str_current_vertex = len(str(current_vertex.id))
+            output_string += f"{current_vertex.id}"
             if current_vertex.data.list_edges:
                 for edge in current_vertex.data.list_edges:
-                    output_string += f" {symbol_arrow} {edge.incoming_vertex.data.id}\n{" " * len_str_current_vertex}"
+                    output_string += f" {symbol_arrow} {edge.incoming_vertex.id}\n{" " * len_str_current_vertex}"
                 output_string = output_string[0 : -len_str_current_vertex]
             else:
                 output_string += f" {symbol_arrow} []\n"
@@ -68,17 +68,17 @@ class Graph(LinkedList):
     def number_vertex(self):
         return Graph.__number_vertex
 
-    def insert_at_begin(self, id: Union[UUID, int]) -> Vertex:
+    def insert_at_begin(self, vertex_id: Union[UUID, int]) -> Vertex:
         Graph.__number_vertex += 1
-        return super().insert_at_begin(ListEdges(id))
+        return super().insert_at_begin(vertex_id, ListEdges())
 
-    def insert_at_index(self, id: Union[UUID, int]) -> Vertex:
+    def insert_at_index(self, vertex_id: Union[UUID, int], index: SupportsIndex) -> Vertex:
         Graph.__number_vertex += 1
-        return super().insert_at_index(ListEdges(id))
+        return super().insert_at_index(vertex_id, ListEdges(), index)
 
-    def insert_at_end(self, id: Union[UUID, int]) -> Vertex:
+    def insert_at_end(self, vertex_id: Union[UUID, int]) -> Vertex:
         Graph.__number_vertex += 1
-        return super().insert_at_end(ListEdges(id))
+        return super().insert_at_end(vertex_id, ListEdges())
 
     def remove_first_vertex(self) -> None:
         raise TypeError("the method is not supported")
@@ -90,14 +90,19 @@ class Graph(LinkedList):
         current_vertex = self.head
         
         while current_vertex:
-            if current_vertex.data.id == target_vertex.data.id:
-                for edge in current_vertex.data.list_edges:
+            if current_vertex.id == target_vertex.id:
+                # В процессе выполнения цикла массив list_edges будет 
+                # изменен, что приведет к нарушению порядка его обхода
+                list_edges_remove = current_vertex.data.list_edges.copy() 
+                for edge in list_edges_remove:
                     self.remove_edge(current_vertex, edge.incoming_vertex)
                 
                 current_vertex.prev.next = current_vertex.next
                 current_vertex.next.prev = current_vertex.prev
+
                 break
-            current_vertex.next
+
+            current_vertex = current_vertex.next
         else:
             raise ValueError("vertex not found")
 
@@ -107,16 +112,16 @@ class Graph(LinkedList):
         incoming_vertex.data.list_edges.append(Edge(incoming_vertex, outgoing_vertex))
 
     def remove_edge(self, outgoing_vertex: Vertex, incoming_vertex: Vertex) -> None:
-        for i in range(len(outgoing_vertex.data.list_edges)):
-            if outgoing_vertex.data.list_edges[i].incoming_vertex.data.id == incoming_vertex.data.id:
-                outgoing_vertex.data.list_edges.pop(i)
+        for edge in outgoing_vertex.data.list_edges:
+            if edge.incoming_vertex == incoming_vertex:
+                outgoing_vertex.data.list_edges.remove(edge)
                 break
         else:
             raise ValueError("edge between the specified vertices was not found")
         
-        for i in range(len(incoming_vertex.data.list_edges)):
-            if incoming_vertex.data.list_edges[i].incoming_vertex.data.id == outgoing_vertex.data.id:
-                incoming_vertex.data.list_edges.pop(i)
+        for edge in incoming_vertex.data.list_edges:
+            if edge.incoming_vertex == outgoing_vertex:
+                incoming_vertex.data.list_edges.remove(edge)
                 break
         
 
@@ -140,3 +145,8 @@ if __name__ == "__main__":
     print(graph)
 
     # graph.remove_edge(list_vertexes[1], list_vertexes[3])
+    graph.remove_vertex(list_vertexes[1])
+
+    print(graph)
+
+
