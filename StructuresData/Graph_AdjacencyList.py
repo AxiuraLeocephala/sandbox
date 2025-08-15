@@ -131,8 +131,8 @@ if __name__ == "__main__":
     graph = Graph("ud")
 
     for i in range(number_vertex):
-        # vertex = graph.insert_at_end(uuid4())
-        vertex = graph.insert_at_end(i)
+        vertex = graph.insert_at_end(uuid4())
+        # vertex = graph.insert_at_end(i)
         list_vertexes.append(vertex)
     
     for i in range(number_vertex - 1):
