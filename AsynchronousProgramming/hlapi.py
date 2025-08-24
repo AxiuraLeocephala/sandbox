@@ -26,7 +26,6 @@ async def func_2() -> int:
     print(f"finish execute func_2 in {time_finish}")
     return 1
 
-
 '''
 (funcion) run - запускает корутину, ожидает ее завершение и возвращает 
 результат или исключение. Блокирует поток, поэтому нельзя вызвать 
@@ -235,7 +234,6 @@ async def main_fo_long_running_task() -> None:
             await long_running_task()
     except TimeoutError:
         print("the waiting time for the task has been exceeded")
-
 
 async def main_for_wait() -> None:
     '''
